@@ -5,6 +5,7 @@
         <title>2048 Arnold AI</title>
 
         <link href="style/main.css" rel="stylesheet" type="text/css">
+        <link href="style/my-css.css" rel="stylesheet" type="text/css">
         <link rel="shortcut icon" href="favicon.ico">
         <link rel="apple-touch-icon" href="meta/apple-touch-icon.png">
         <link rel="apple-touch-startup-image" href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"> <!-- iPhone 5+ -->
@@ -25,16 +26,30 @@
                     <div class="best-container">0</div>
                 </div>
             </div>
-            
-            <div>
-                <p>
-                    <small><i>Esta es una IA creada por Jose Romero, cuya finalidad es probar sus conociemientos sobre el reconocido juego 2048</i></small>
-                </p>
-            </div>
 
             <div class="above-game">
                 <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
                 <a class="restart-button">New Game</a>
+            </div>
+
+            <div class="arnold-container">
+                <p>
+                    <small><i>Esta es una IA creada por Jose Romero, cuya finalidad es probar sus conociemientos sobre el reconocido juego 2048</i></small>
+                </p>
+                <div class="my-row">
+                    <div class="my-col">
+                        <p>Arnold can do it! <button id="arnold-btn">Go!</button></p>
+                    </div> 
+
+                    <div class="my-col arnold-table">
+                        <p id="generation">
+                            Generation <span>0</span>
+                        </p>
+                        <p id="gen">
+                            Gen <span>0</span>
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <div class="game-container">
@@ -101,5 +116,9 @@
         <script src="js/local_storage_manager.js"></script>
         <script src="js/game_manager.js"></script>
         <script src="js/application.js"></script>
+        <script src="js/jquery-3.3.1.min.js"></script>    
+
+        <!-- The Arnold AI :D -->
+        <script src="js/arnold-ai.js"></script>     
     </body>
 </html>
