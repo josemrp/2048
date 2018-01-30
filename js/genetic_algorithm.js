@@ -1,5 +1,5 @@
 function GeneticAlgorithm() {
-    console.log('Algoritmo genetico');
+    //console.log('Algoritmo genetico');
 }
 
 GeneticAlgorithm.prototype.createActivators = function(n) {
@@ -25,13 +25,13 @@ GeneticAlgorithm.prototype.createWeights = function(init, final) {
 GeneticAlgorithm.prototype.createGen = function() {
     var gen = {
         weigths: [],
-        activator: [],
+        activators: [],
         best: 0
-    };
+    };    
     
-    gen.activator[0] = this.createActivators(5);
-    gen.activator[1] = this.createActivators(5);
-    gen.activator[2] = this.createActivators(4);
+    gen.activators[0] = this.createActivators(5);
+    gen.activators[1] = this.createActivators(5);
+    gen.activators[2] = this.createActivators(4);
     
     gen.weigths[0] = this.createWeights(16, 5);
     gen.weigths[1] = this.createWeights(5, 5);
