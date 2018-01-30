@@ -15,7 +15,8 @@ GeneticAlgorithm.prototype.createWeights = function(init, final) {
     for(var i = 0; i < init; i++) {
         weigth[i] = [];
         for(var j = 0; j < final; j++) {
-            weigth[i][j] = Math.random() < 0.5 ? Math.random() : Math.random() * -1;
+            //weigth[i][j] = Math.random() < 0.5 ? Math.random() : Math.random() * -1;
+            weigth[i][j] = Math.random();
         }
     }
     return weigth;
