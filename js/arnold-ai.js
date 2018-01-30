@@ -4,18 +4,23 @@
  */
 
 function ArnoldAI() {
-    //alert('Hey! I am Arnold');
+    console.log('Hey! I am Arnold');
     this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
 };
 
 ArnoldAI.prototype.getData = function () {
     var self = this;
     console.log(self.game.grid.cells);
+    return this.game.grid.cells;
 };
 
 ArnoldAI.prototype.evaluate = function() {
+    var dir = 0;
     //Do something
-    return 0;
+    var ga = new GeneticAlgorithm();
+    var nn = new NeuralNetwork();
+    console.log(ga.createGeneration(10));
+    return dir;
 };
 
 ArnoldAI.prototype.go = function() {
