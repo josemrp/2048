@@ -5,38 +5,96 @@
 
 function ArnoldAI() {
     console.log('Hey! I am Arnold');
-    this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+    this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);    
 };
 
 ArnoldAI.prototype.getTiles = function () {
     return this.game.grid.cells;
 };
 
-ArnoldAI.prototype.play = function(gen) {
-    /*
-     * 1.-  Tomar el gen
-     * 2.-  Tomar los valores actuales de las celdas
-     * 3.-  Crear la red neuronal con los genes actuales
-     * 3.-  Jugar con este gen, actualizar tablero de vez en cuando
-     */
-    var best = 0;
-    var network = new NeuralNetwork(gen);
+ArnoldAI.prototype.makeCopy = function(tiles) {
+    var copy = []
+    for(var i = 0; i < 4; i++) {
+        copy[i] = []
+        for(var j = 0; j < 4; j++) {
+            if(tiles[i][j] === null)
+                copy[i][j] = null;
+            else
+                copy[i][j] = tiles[i][j].value;
+        }
+    }
+    return copy;
+}; 
+
+ArnoldAI.prototype.checkIfDontMove = function (oldTiles) {
     
-    //Ciclo para cada movimiento hasta el game over
-    var tiles = this.getTiles();
+    var newTitles = this.getTiles();
     
-    var dir = network.moveWhere(tiles);
-    console.log(dir);
-    
-    if(dir !== null)
-        this.game.move(dir)
-    else
-        alert('No direction');
-    //Hasta el game over
-    return best;    
+    for(var i = 0; i < 4; i++) {
+        for(var j = 0; j < 4; j++) {
+            if(newTitles[i][j] === null && oldTiles[i][j] === null)
+                continue;
+            else if(newTitles[i][j] === null)
+                return false;
+            else if(oldTiles[i][j] === null)
+                return false;                    
+            else if(newTitles[i][j].value !== oldTiles[i][j]) {
+                return false;
+            }
+        }
+    }
+    console.log('No move');
+    return true;
 };
 
-ArnoldAI.prototype.go = function() {
+ArnoldAI.prototype.play = function (gen) {
+    
+    var self = this;
+    var tiles, copy, dir;
+    var network = new NeuralNetwork(gen);
+    
+    do {
+        tiles = self.getTiles();
+        copy = self.makeCopy(tiles);
+        
+        dir = network.moveWhere(tiles);
+
+        if (dir !== null)
+            self.game.move(dir)
+        else
+            alert('No direction');
+
+        if(self.checkIfDontMove(copy))
+            self.game.over = true;
+        
+    } while( ! self.game.over);
+    
+    self.game.actuate();    //Show the game over
+
+    /*var loop = setInterval(function () {
+
+        var tiles = self.getTiles();
+        var copy = self.makeCopy(tiles);
+        
+        var dir = network.moveWhere(tiles);
+
+        if (dir !== null)
+            self.game.move(dir)
+        else
+            alert('No direction');
+
+        if(self.checkIfDontMove(copy))
+            self.game.over = true;
+        
+        if (self.game.over) {
+            self.game.actuate();    //Show the game over
+            clearInterval(loop);
+        }
+        
+    }, 400);*/
+};
+
+ArnoldAI.prototype.go = function () {
     
     /*
      * 1.-  Crear los primeros especimenes
@@ -48,8 +106,8 @@ ArnoldAI.prototype.go = function() {
     var genetic = new GeneticAlgorithm();
     var generation = genetic.createGeneration(50);
     
-    //Ciclo grande para cada gen
-    var best = this.play(generation[0]);
+    this.play(generation[0]);
+    
 };
 
 $(document).ready(function () {
