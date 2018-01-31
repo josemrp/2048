@@ -5,7 +5,8 @@
 
 function ArnoldAI() {
     console.log('Hey! I am Arnold');
-    this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);    
+    this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);   
+    this.isPlaying = false;
 };
 
 ArnoldAI.prototype.getTiles = function () {
@@ -49,29 +50,11 @@ ArnoldAI.prototype.checkIfDontMove = function (oldTiles) {
 
 ArnoldAI.prototype.play = function (gen) {
     
+    this.isPlaying = true;
     var self = this;
-    var tiles, copy, dir;
     var network = new NeuralNetwork(gen);
-    
-    do {
-        tiles = self.getTiles();
-        copy = self.makeCopy(tiles);
-        
-        dir = network.moveWhere(tiles);
 
-        if (dir !== null)
-            self.game.move(dir)
-        else
-            alert('No direction');
-
-        if(self.checkIfDontMove(copy))
-            self.game.over = true;
-        
-    } while( ! self.game.over);
-    
-    self.game.actuate();    //Show the game over
-
-    /*var loop = setInterval(function () {
+    var loop = setInterval(function () {
 
         var tiles = self.getTiles();
         var copy = self.makeCopy(tiles);
@@ -88,10 +71,11 @@ ArnoldAI.prototype.play = function (gen) {
         
         if (self.game.over) {
             self.game.actuate();    //Show the game over
+            self.isPlaying = false;
             clearInterval(loop);
         }
         
-    }, 400);*/
+    }, 400);
 };
 
 ArnoldAI.prototype.go = function () {
@@ -107,6 +91,15 @@ ArnoldAI.prototype.go = function () {
     var generation = genetic.createGeneration(50);
     
     this.play(generation[0]);
+    
+    var self = this;
+    var loop = setInterval(function() {
+        if( ! self.isPlaying) {
+            generation[0].best = self.game.score;
+            alert(generation[0].best);
+            clearInterval(loop);
+        }
+    },1000);
     
 };
 
