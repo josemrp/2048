@@ -104,6 +104,7 @@ ArnoldAI.prototype.go = function (generation) {
                 clearInterval(loop);                
 
             generation[i].best = self.game.score;
+            console.log(i);
             i++;
 
             if (i < n) {                                //While
@@ -114,10 +115,15 @@ ArnoldAI.prototype.go = function (generation) {
             } else {
 
                 if (!self.game.won) {
+                    
+                    clearInterval(loop); 
+                    
                     var genetic = new GeneticAlgorithm();
                     var newGeneration = genetic.pair(generation);
                     self.generationSpan.html(++self.generationCounter);
+                    
                     self.go(newGeneration);
+                    
                 }
 
 
@@ -132,7 +138,7 @@ $(document).ready(function () {
     var arnold = new ArnoldAI;
     $('#arnold-btn').on('click', function () {
         var genetic = new GeneticAlgorithm();
-        var firstGeneration = genetic.createGeneration(10);
+        var firstGeneration = genetic.createGeneration(100);
         arnold.go(firstGeneration);
     });
 });
