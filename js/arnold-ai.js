@@ -62,10 +62,10 @@ ArnoldAI.prototype.play = function (gen) {
 
         var dir = network.moveWhere(tiles);
 
-        if (dir !== null)
+        if (dir !== null) 
             self.game.move(dir)
         else
-            alert('No direction');
+            self.game.over = true;
 
         if (self.checkIfDontMove(copy))
             self.game.over = true;
@@ -85,8 +85,9 @@ ArnoldAI.prototype.go = function (generation) {
      * 5.-  Volver al (2) hasta llegar a 2048
      */
     var i = 0;
+    var n = generation.length;
 
-    this.play(generation[i]);                       //Do
+    this.play(generation[i]);                           //Do
 
     var self = this;
     var loop = setInterval(function () {
@@ -95,14 +96,14 @@ ArnoldAI.prototype.go = function (generation) {
             generation[i].best = self.game.score;
             console.log(generation[i].best);
             i++;
-            if (i < 5) {                                //While
+            if (i < n) {                                //While
                 self.game.restart();
                 self.play(generation[i]);
             } else {
                 clearInterval(loop);
                 var genetic = new GeneticAlgorithm();
                 var newGeneration = genetic.pair(generation);
-                //self.go(newGeneration);
+                self.go(newGeneration);
             }
 
         }
@@ -114,7 +115,7 @@ $(document).ready(function () {
     var arnold = new ArnoldAI;
     $('#arnold-btn').on('click', function () {
         var genetic = new GeneticAlgorithm();
-        var firstGeneration = genetic.createGeneration(5);
+        var firstGeneration = genetic.createGeneration(10);
         arnold.go(firstGeneration);
     });
 });
