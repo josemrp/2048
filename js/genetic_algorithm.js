@@ -122,7 +122,6 @@ GeneticAlgorithm.prototype.pairTheBest = function (generation) {
 
 GeneticAlgorithm.prototype.mutate = function (generation, numMutations) {
 
-    var newGeneration = [];
     var n = generation.length;
     var fork;
     var cap;
@@ -154,7 +153,7 @@ GeneticAlgorithm.prototype.mutate = function (generation, numMutations) {
         }
     }
 
-    return newGeneration = generation;
+    return generation;
 };
 
 GeneticAlgorithm.prototype.pair = function (generation) {

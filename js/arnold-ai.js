@@ -7,6 +7,9 @@ function ArnoldAI() {
     console.log('Hey! I am Arnold');
     this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
     this.isPlaying = false;
+    this.genSpan = $('#gen').find('span');
+    this.generationSpan = $('#generation').find('span');
+    this.generationCounter = 1;
 }
 ;
 
@@ -62,7 +65,7 @@ ArnoldAI.prototype.play = function (gen) {
 
         var dir = network.moveWhere(tiles);
 
-        if (dir !== null) 
+        if (dir !== null)
             self.game.move(dir)
         else
             self.game.over = true;
@@ -70,20 +73,19 @@ ArnoldAI.prototype.play = function (gen) {
         if (self.checkIfDontMove(copy))
             self.game.over = true;
 
-        if (self.game.over) {
-            self.game.actuate();    //Show the game over
-            self.isPlaying = false;
+        if (self.game.over || self.game.won) {
+
             clearInterval(loop);
+            self.game.actuate();    //Show the game over or congratulations
+            self.isPlaying = false;
+
         }
 
-    }, 300);
+    }, 200);
 };
 
 ArnoldAI.prototype.go = function (generation) {
 
-    /*
-     * 5.-  Volver al (2) hasta llegar a 2048
-     */
     var i = 0;
     var n = generation.length;
 
@@ -92,22 +94,37 @@ ArnoldAI.prototype.go = function (generation) {
     var self = this;
     var loop = setInterval(function () {
 
+        var count = i;
+        self.genSpan.html(count + 1);
+
         if (!self.isPlaying) {
+
+            //Congratulations, you are the best
+            if(self.game.won)
+                clearInterval(loop);                
+
             generation[i].best = self.game.score;
-            console.log(generation[i].best);
             i++;
+
             if (i < n) {                                //While
+
                 self.game.restart();
                 self.play(generation[i]);
+
             } else {
-                clearInterval(loop);
-                var genetic = new GeneticAlgorithm();
-                var newGeneration = genetic.pair(generation);
-                self.go(newGeneration);
+
+                if (!self.game.won) {
+                    var genetic = new GeneticAlgorithm();
+                    var newGeneration = genetic.pair(generation);
+                    self.generationSpan.html(++self.generationCounter);
+                    self.go(newGeneration);
+                }
+
+
             }
 
         }
-    }, 1500);
+    }, 1000);
 
 };
 
