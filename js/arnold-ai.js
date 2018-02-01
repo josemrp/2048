@@ -5,51 +5,52 @@
 
 function ArnoldAI() {
     console.log('Hey! I am Arnold');
-    this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);   
+    this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
     this.isPlaying = false;
-};
+}
+;
 
 ArnoldAI.prototype.getTiles = function () {
     return this.game.grid.cells;
 };
 
-ArnoldAI.prototype.makeCopy = function(tiles) {
+ArnoldAI.prototype.makeCopy = function (tiles) {
     var copy = []
-    for(var i = 0; i < 4; i++) {
+    for (var i = 0; i < 4; i++) {
         copy[i] = []
-        for(var j = 0; j < 4; j++) {
-            if(tiles[i][j] === null)
+        for (var j = 0; j < 4; j++) {
+            if (tiles[i][j] === null)
                 copy[i][j] = null;
             else
                 copy[i][j] = tiles[i][j].value;
         }
     }
     return copy;
-}; 
+};
 
 ArnoldAI.prototype.checkIfDontMove = function (oldTiles) {
-    
+
     var newTitles = this.getTiles();
-    
-    for(var i = 0; i < 4; i++) {
-        for(var j = 0; j < 4; j++) {
-            if(newTitles[i][j] === null && oldTiles[i][j] === null)
+
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            if (newTitles[i][j] === null && oldTiles[i][j] === null)
                 continue;
-            else if(newTitles[i][j] === null)
+            else if (newTitles[i][j] === null)
                 return false;
-            else if(oldTiles[i][j] === null)
-                return false;                    
-            else if(newTitles[i][j].value !== oldTiles[i][j]) {
+            else if (oldTiles[i][j] === null)
+                return false;
+            else if (newTitles[i][j].value !== oldTiles[i][j]) {
                 return false;
             }
         }
     }
-    console.log('No move');
+
     return true;
 };
 
 ArnoldAI.prototype.play = function (gen) {
-    
+
     this.isPlaying = true;
     var self = this;
     var network = new NeuralNetwork(gen);
@@ -58,7 +59,7 @@ ArnoldAI.prototype.play = function (gen) {
 
         var tiles = self.getTiles();
         var copy = self.makeCopy(tiles);
-        
+
         var dir = network.moveWhere(tiles);
 
         if (dir !== null)
@@ -66,47 +67,55 @@ ArnoldAI.prototype.play = function (gen) {
         else
             alert('No direction');
 
-        if(self.checkIfDontMove(copy))
+        if (self.checkIfDontMove(copy))
             self.game.over = true;
-        
+
         if (self.game.over) {
             self.game.actuate();    //Show the game over
             self.isPlaying = false;
             clearInterval(loop);
         }
-        
-    }, 400);
+
+    }, 300);
 };
 
-ArnoldAI.prototype.go = function () {
-    
+ArnoldAI.prototype.go = function (generation) {
+
     /*
-     * 1.-  Crear los primeros especimenes
-     * 2.-  Probar y puntuar cada uno
-     * 3.-  Clasificar
-     * 4.-  Convinar mejores y mutar
      * 5.-  Volver al (2) hasta llegar a 2048
      */
-    var genetic = new GeneticAlgorithm();
-    var generation = genetic.createGeneration(50);
-    
-    this.play(generation[0]);
-    
+    var i = 0;
+
+    this.play(generation[i]);                       //Do
+
     var self = this;
-    var loop = setInterval(function() {
-        if( ! self.isPlaying) {
-            generation[0].best = self.game.score;
-            alert(generation[0].best);
-            clearInterval(loop);
+    var loop = setInterval(function () {
+
+        if (!self.isPlaying) {
+            generation[i].best = self.game.score;
+            console.log(generation[i].best);
+            i++;
+            if (i < 5) {                                //While
+                self.game.restart();
+                self.play(generation[i]);
+            } else {
+                clearInterval(loop);
+                var genetic = new GeneticAlgorithm();
+                var newGeneration = genetic.pair(generation);
+                //self.go(newGeneration);
+            }
+
         }
-    },1000);
-    
+    }, 1500);
+
 };
 
 $(document).ready(function () {
     var arnold = new ArnoldAI;
     $('#arnold-btn').on('click', function () {
-        arnold.go();
+        var genetic = new GeneticAlgorithm();
+        var firstGeneration = genetic.createGeneration(5);
+        arnold.go(firstGeneration);
     });
 });
 

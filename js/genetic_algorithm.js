@@ -2,19 +2,19 @@ function GeneticAlgorithm() {
     //console.log('Algoritmo genetico');
 }
 
-GeneticAlgorithm.prototype.createActivators = function(n) {
+GeneticAlgorithm.prototype.createActivators = function (n) {
     var activator = [];
-    for(var i = 0; i < n; i++) {
+    for (var i = 0; i < n; i++) {
         activator[i] = Math.random();
     }
     return activator;
 };
 
-GeneticAlgorithm.prototype.createWeights = function(init, final) {
+GeneticAlgorithm.prototype.createWeights = function (init, final) {
     var weigth = [];
-    for(var i = 0; i < init; i++) {
+    for (var i = 0; i < init; i++) {
         weigth[i] = [];
-        for(var j = 0; j < final; j++) {
+        for (var j = 0; j < final; j++) {
             //weigth[i][j] = Math.random() < 0.5 ? Math.random() : Math.random() * -1;
             weigth[i][j] = Math.random();
         }
@@ -22,28 +22,62 @@ GeneticAlgorithm.prototype.createWeights = function(init, final) {
     return weigth;
 };
 
-GeneticAlgorithm.prototype.createGen = function() {
+GeneticAlgorithm.prototype.createGen = function () {
     var gen = {
         weigths: [],
         activators: [],
         best: 0
-    };    
-    
+    };
+
     gen.activators[0] = this.createActivators(5);
     gen.activators[1] = this.createActivators(5);
     gen.activators[2] = this.createActivators(4);
-    
+
     gen.weigths[0] = this.createWeights(16, 5);
     gen.weigths[1] = this.createWeights(5, 5);
     gen.weigths[2] = this.createWeights(5, 4);
-    
+
     return gen;
 };
 
-GeneticAlgorithm.prototype.createGeneration = function(n) {
+GeneticAlgorithm.prototype.createGeneration = function (n) {
     var generation = [];
-    for(var i = 0; i < n; i++) {
+    for (var i = 0; i < n; i++) {
         generation[i] = this.createGen();
     }
     return generation;
+};
+
+GeneticAlgorithm.prototype.sortGens = function (generation) {
+    
+    //Sort in JS 
+    generation.sort(function (a, b) {
+        return parseFloat(b.best) - parseFloat(a.best);
+    });
+    
+    return generation;
+};
+
+GeneticAlgorithm.prototype.pairTheBest = function (generation) {
+    
+    //Do something
+};
+
+GeneticAlgorithm.prototype.mutate = function (generation) {
+    
+    //Do something
+};
+
+GeneticAlgorithm.prototype.pair = function (generation) {
+    /*
+     * 1.- Combinar
+     * 2.- Mutar
+     */
+    var newGeneration;
+    newGeneration = this.sortGens(generation);
+    newGeneration = this.pairTheBest(newGeneration);
+    newGeneration = this.mutate(newGeneration);
+    console.log(newGeneration);
+    
+    return newGeneration;
 };
