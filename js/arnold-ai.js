@@ -10,6 +10,14 @@ function ArnoldAI() {
     this.genSpan = $('#gen').find('span');
     this.generationSpan = $('#generation').find('span');
     this.generationCounter = 1;
+    
+    this.moveStore = {
+        cont: 0,
+        up: 0,
+        down: 0,
+        right: 0,
+        left: 0
+    };
 }
 ;
 
@@ -52,6 +60,41 @@ ArnoldAI.prototype.checkIfDontMove = function (oldTiles) {
     return true;
 };
 
+ArnoldAI.prototype.storageTheMove = function (dir) {
+    this.moveStore.cont++;
+    if(dir === 0)
+        this.moveStore.up++;
+    else if(dir === 1)
+        this.moveStore.right++;
+    else if(dir === 2)
+        this.moveStore.down++;
+    else if(dir === 3)
+        this.moveStore.left++;
+}
+
+ArnoldAI.prototype.checkStorageMove = function () {
+    
+    //  Penaliza los movimientos repetitivos
+    if(this.moveStore.cont === this.moveStore.up)
+        this.game.score = this.game.score / 151;
+    else if(this.moveStore.cont === this.moveStore.right)
+        this.game.score = this.game.score / 151;
+    else if(this.moveStore.cont === this.moveStore.down)
+        this.game.score = this.game.score / 151;
+    else if(this.moveStore.cont === this.moveStore.left)
+        this.game.score = this.game.score / 151;
+    else
+        console.log('una buena');
+    
+    this.moveStore = {
+        cont: 0,
+        up: 0,
+        down: 0,
+        right: 0,
+        left: 0
+    };
+}
+
 ArnoldAI.prototype.play = function (gen) {
 
     this.isPlaying = true;
@@ -64,6 +107,7 @@ ArnoldAI.prototype.play = function (gen) {
         var copy = self.makeCopy(tiles);
 
         var dir = network.moveWhere(tiles);
+        self.storageTheMove(dir);
 
         if (dir !== null)
             self.game.move(dir)
@@ -93,18 +137,19 @@ ArnoldAI.prototype.go = function (generation) {
 
     var self = this;
     var loop = setInterval(function () {
-
-        var count = i;
-        self.genSpan.html(count + 1);
+        
+        self.genSpan.html(i + 1);
 
         if (!self.isPlaying) {
 
             //Congratulations, you are the best
-            if(self.game.won)
-                clearInterval(loop);                
+            if(self.game.won) {
+                clearInterval(loop); 
+                return;
+            }               
 
+            self.checkStorageMove();  //Penalizacion
             generation[i].best = self.game.score;
-            console.log(i);
             i++;
 
             if (i < n) {                                //While
@@ -113,10 +158,10 @@ ArnoldAI.prototype.go = function (generation) {
                 self.play(generation[i]);
 
             } else {
+                
+                clearInterval(loop); 
 
                 if (!self.game.won) {
-                    
-                    clearInterval(loop); 
                     
                     var genetic = new GeneticAlgorithm();
                     var newGeneration = genetic.pair(generation);
@@ -130,7 +175,7 @@ ArnoldAI.prototype.go = function (generation) {
             }
 
         }
-    }, 1000);
+    }, 400);
 
 };
 
@@ -138,7 +183,7 @@ $(document).ready(function () {
     var arnold = new ArnoldAI;
     $('#arnold-btn').on('click', function () {
         var genetic = new GeneticAlgorithm();
-        var firstGeneration = genetic.createGeneration(100);
+        var firstGeneration = genetic.createGeneration(1000);
         arnold.go(firstGeneration);
     });
 });

@@ -48,11 +48,33 @@ NeuralNetwork.prototype.moveWhere = function (tiles) {
     
     this.tiles = this.sortTiles(tiles);
     
+    // 0: vertical, 1: horizontal
+    var orientation = this.neuron(3, 0);
+    
+    // 0: negative, 1: positive
+    var meaning = this.neuron(3, 1);
+    
+    if(orientation === 0) {
+        if(meaning === 1) {
+            return 0;   //up
+        } else {
+            return 2;   //down
+        }
+    } else {
+        if(meaning === 1) {
+            return 1;   //right
+        } else {
+            return 3;   //left
+        }
+        
+    }
+    
+    /*
     // 0: up, 1: right, 2: down, 3: left
     for(var i = 0; i < 4; i++)
         if(this.neuron(3, i) === 1)
             return i;
-    
+    */
     //Tendrá preferencia de mover hacia arriba, deberia penalizar el hecho de varias opciones multiples
     return null;
 };
