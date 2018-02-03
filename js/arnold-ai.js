@@ -71,7 +71,7 @@ ArnoldAI.prototype.storageTheMove = function (dir) {
         this.moveStore.down++;
     else if(dir === 3)
         this.moveStore.left++;
-}
+};
 
 ArnoldAI.prototype.checkStorageMove = function () {
     
@@ -100,7 +100,7 @@ ArnoldAI.prototype.checkStorageMove = function () {
         right: 0,
         left: 0
     };
-}
+};
 
 ArnoldAI.prototype.play = function (gen) {
 
@@ -117,7 +117,7 @@ ArnoldAI.prototype.play = function (gen) {
         self.storageTheMove(dir);
 
         if (dir !== null)
-            self.game.move(dir)
+            self.game.move(dir);
         else
             self.game.over = true;
 
