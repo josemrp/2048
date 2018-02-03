@@ -3,15 +3,19 @@
  * His name is Arnold like Arnold Schwarzenegger :D
  */
 
-function ArnoldAI() {
+function ArnoldAI(nIndividuals) {
     console.log('Hey! I am Arnold');
     this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
-    this.isPlaying = false;
+
+    this.genetic = new GeneticAlgorithm();
+    this.generation = this.genetic.createGeneration(nIndividuals);
+
     this.genSpan = $('#gen').find('span');
     this.generationSpan = $('#generation').find('span');
-    this.generationCounter = 1;
-    this.goodStore = 0;
     
+    this.nIndividuals = nIndividuals;
+    this.goodStore = 0;
+
     this.moveStore = {
         cont: 0,
         up: 0,
@@ -63,36 +67,36 @@ ArnoldAI.prototype.checkIfDontMove = function (oldTiles) {
 
 ArnoldAI.prototype.storageTheMove = function (dir) {
     this.moveStore.cont++;
-    if(dir === 0)
+    if (dir === 0)
         this.moveStore.up++;
-    else if(dir === 1)
+    else if (dir === 1)
         this.moveStore.right++;
-    else if(dir === 2)
+    else if (dir === 2)
         this.moveStore.down++;
-    else if(dir === 3)
+    else if (dir === 3)
         this.moveStore.left++;
 };
 
 ArnoldAI.prototype.checkStorageMove = function () {
-    
+
     //  Penaliza los movimientos repetitivos
-    if(this.moveStore.cont === this.moveStore.up)
+    if (this.moveStore.cont === this.moveStore.up)
         this.game.score = this.game.score / 151;
-    else if(this.moveStore.cont === this.moveStore.right)
+    else if (this.moveStore.cont === this.moveStore.right)
         this.game.score = this.game.score / 151;
-    else if(this.moveStore.cont === this.moveStore.down)
+    else if (this.moveStore.cont === this.moveStore.down)
         this.game.score = this.game.score / 151;
-    else if(this.moveStore.cont === this.moveStore.left)
+    else if (this.moveStore.cont === this.moveStore.left)
         this.game.score = this.game.score / 151;
     else
     {
         //  Premia a los que muevan en todas las direcciones
-        if(this.moveStore.up > 0 && this.moveStore.right > 0 && this.moveStore.down > 0 && this.moveStore.left > 0)
+        if (this.moveStore.up > 0 && this.moveStore.right > 0 && this.moveStore.down > 0 && this.moveStore.left > 0)
             this.game.score = this.game.score * 10;
         this.goodStore++;
         console.log('Eureka: ' + this.goodStore + ' -> ' + this.game.score);
     }
-    
+
     this.moveStore = {
         cont: 0,
         up: 0,
@@ -104,96 +108,68 @@ ArnoldAI.prototype.checkStorageMove = function () {
 
 ArnoldAI.prototype.play = function (gen) {
 
-    this.isPlaying = true;
-    var self = this;
     var network = new NeuralNetwork(gen);
 
-    var loop = setInterval(function () {
+    var tiles, copy, dir;
 
-        var tiles = self.getTiles();
-        var copy = self.makeCopy(tiles);
+    do {
 
-        var dir = network.moveWhere(tiles);
-        self.storageTheMove(dir);
+        tiles = this.getTiles();
+        copy = this.makeCopy(tiles);
+
+        dir = network.moveWhere(tiles);
+        this.storageTheMove(dir);
 
         if (dir !== null)
-            self.game.move(dir);
+            this.game.move(dir);
         else
-            self.game.over = true;
+            this.game.over = true;
 
-        if (self.checkIfDontMove(copy))
-            self.game.over = true;
+        if (this.checkIfDontMove(copy))
+            this.game.over = true;
 
-        if (self.game.over || self.game.won) {
+    } while (!this.game.over && !this.game.won);
 
-            clearInterval(loop);
-            self.game.actuate();    //Show the game over or congratulations
-            self.isPlaying = false;
+    this.game.actuate();    //Show the game over or congratulations    
+    this.checkStorageMove();
+    gen.best = this.game.score;
 
-        }
-
-    }, 350);
 };
 
-ArnoldAI.prototype.go = function (generation) {
+ArnoldAI.prototype.go = function () {
 
     var i = 0;
-    var n = generation.length;
-    
-    console.log(generation[i]);
+    var j = 0;
 
-    this.play(generation[i]);                           //Do
+    do {
 
-    var self = this;
-    var loop = setInterval(function () {
+        i = 0;
+        this.goodStore = 0;
+        this.generationSpan.html(++j);
+
+        do {
+
+            this.game.restart();
+            this.genSpan.html(i + 1);
+            this.play(this.generation[i++]);
+
+        } while (!this.game.won && i < this.nIndividuals);
         
-        self.genSpan.html(i + 1);
+        if(!this.game.won)
+            this.generation = this.genetic.pair(this.generation);
 
-        if (!self.isPlaying) {
+    } while (!this.game.won);
 
-            //Congratulations, you are the best
-            if(self.game.won) {
-                clearInterval(loop); 
-                return;
-            }               
-
-            self.checkStorageMove();  //Penalizacion
-            generation[i].best = self.game.score;
-            i++;
-
-            if (i < n) {                                //While
-
-                self.game.restart();
-                self.play(generation[i]);
-
-            } else {
-                
-                clearInterval(loop); 
-
-                if (!self.game.won) {
-                    
-                    var genetic = new GeneticAlgorithm();
-                    var newGeneration = genetic.pair(generation);
-                    self.generationSpan.html(++self.generationCounter);
-                    
-                    self.go(newGeneration);
-                    
-                }
-
-
-            }
-
-        }
-    }, 700);
+    //  Congratulations!!!
+    console.log(this.generation[i - 1]);
 
 };
 
 $(document).ready(function () {
-    var arnold = new ArnoldAI;
-    $('#arnold-btn').on('click', function () {
-        var genetic = new GeneticAlgorithm();
-        var firstGeneration = genetic.createGeneration(1000);
-        arnold.go(firstGeneration);
+    var arnold = new ArnoldAI(1000);
+    console.log(arnold.generation[0]);
+    $('#arnold-btn').on('click', function () {        
+        arnold.go();        
     });
 });
 

@@ -1,7 +1,7 @@
 function GeneticAlgorithm() {
     //console.log('Algoritmo genetico');
-    this.cap = 5;
-    this.act = 10;
+    this.cap = 2;
+    this.act = 12;
 };
 
 GeneticAlgorithm.prototype.createActivators = function (n) {
@@ -86,8 +86,9 @@ GeneticAlgorithm.prototype.sortGens = function (generation) {
     generation.sort(function (a, b) {
         return parseFloat(b.best) - parseFloat(a.best);
     });
-
-    console.log(generation[0].best); //Shows the best of each generation
+    
+    var keepScore = generation[0].best;
+    console.log('The best of past generation do: ' + keepScore);
     return generation;
 };
 
