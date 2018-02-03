@@ -47,12 +47,13 @@ NeuralNetwork.prototype.neuron = function (cap, j) {
 NeuralNetwork.prototype.moveWhere = function (tiles) {
     
     this.tiles = this.sortTiles(tiles);
+    var lastCap = this.gen.activators.length;
     
     // 0: vertical, 1: horizontal
-    var orientation = this.neuron(3, 0);
+    var orientation = this.neuron(lastCap, 0);
     
     // 0: negative, 1: positive
-    var meaning = this.neuron(3, 1);
+    var meaning = this.neuron(lastCap, 1);
     
     if(orientation === 0) {
         if(meaning === 1) {
@@ -69,13 +70,6 @@ NeuralNetwork.prototype.moveWhere = function (tiles) {
         
     }
     
-    /*
-    // 0: up, 1: right, 2: down, 3: left
-    for(var i = 0; i < 4; i++)
-        if(this.neuron(3, i) === 1)
-            return i;
-    */
-    //Tendrá preferencia de mover hacia arriba, deberia penalizar el hecho de varias opciones multiples
     return null;
 };
 

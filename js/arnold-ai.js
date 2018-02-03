@@ -10,6 +10,7 @@ function ArnoldAI() {
     this.genSpan = $('#gen').find('span');
     this.generationSpan = $('#generation').find('span');
     this.generationCounter = 1;
+    this.goodStore = 0;
     
     this.moveStore = {
         cont: 0,
@@ -84,7 +85,13 @@ ArnoldAI.prototype.checkStorageMove = function () {
     else if(this.moveStore.cont === this.moveStore.left)
         this.game.score = this.game.score / 151;
     else
-        console.log('una buena');
+    {
+        //  Premia a los que muevan en todas las direcciones
+        if(this.moveStore.up > 0 && this.moveStore.right > 0 && this.moveStore.down > 0 && this.moveStore.left > 0)
+            this.game.score = this.game.score * 10;
+        this.goodStore++;
+        console.log('Eureka: ' + this.goodStore + ' -> ' + this.game.score);
+    }
     
     this.moveStore = {
         cont: 0,
@@ -125,13 +132,15 @@ ArnoldAI.prototype.play = function (gen) {
 
         }
 
-    }, 200);
+    }, 350);
 };
 
 ArnoldAI.prototype.go = function (generation) {
 
     var i = 0;
     var n = generation.length;
+    
+    console.log(generation[i]);
 
     this.play(generation[i]);                           //Do
 
@@ -175,7 +184,7 @@ ArnoldAI.prototype.go = function (generation) {
             }
 
         }
-    }, 400);
+    }, 700);
 
 };
 

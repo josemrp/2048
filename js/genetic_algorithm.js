@@ -1,6 +1,8 @@
 function GeneticAlgorithm() {
     //console.log('Algoritmo genetico');
-}
+    this.cap = 5;
+    this.act = 10;
+};
 
 GeneticAlgorithm.prototype.createActivators = function (n) {
     var activator = [];
@@ -57,16 +59,16 @@ GeneticAlgorithm.prototype.createGen = function () {
         best: 0
     };
 
-    gen.activators[0] = this.createActivators(8);
-    gen.activators[1] = this.createActivators(8);
-    gen.activators[2] = this.createActivators(2);
-    //gen.activators[3] = this.createActivators(2);
-
-    gen.weigths[0] = this.createWeights(16, 8);
-    gen.weigths[1] = this.createWeights(8, 8);
-    gen.weigths[2] = this.createWeights(8, 2);
-    //gen.weigths[3] = this.createWeights(4, 2);
-
+    gen.weigths[0] = this.createWeights(16, this.act);
+    for(var i = 0; i < this.cap; i++)
+    {
+        gen.activators[i] = this.createActivators(this.act);
+        if(i > 0)
+            gen.weigths[i] = this.createWeights(this.act, this.act);
+    }
+    gen.activators[i] = this.createActivators(2);
+    gen.weigths[i] = this.createWeights(this.act, 2);
+    
     return gen;
 };
 
@@ -85,7 +87,7 @@ GeneticAlgorithm.prototype.sortGens = function (generation) {
         return parseFloat(b.best) - parseFloat(a.best);
     });
 
-    console.log(generation[0].best) //Shows the best of each generation
+    console.log(generation[0].best); //Shows the best of each generation
     return generation;
 };
 
@@ -95,26 +97,26 @@ GeneticAlgorithm.prototype.pairGen = function (parents) {
         activators: [],
         best: 0
     };
-
-    gen.activators[0] = this.pairActivators(8, parents, 0);
-    gen.activators[1] = this.pairActivators(8, parents, 1);
-    gen.activators[2] = this.pairActivators(2, parents, 2);
-    //gen.activators[3] = this.pairActivators(2, parents, 3);
-
-    gen.weigths[0] = this.pairWeights(16, 8, parents, 0);
-    gen.weigths[1] = this.pairWeights(8, 8, parents, 1);
-    gen.weigths[2] = this.pairWeights(8, 2, parents, 2);
-    //gen.weigths[3] = this.pairWeights(4, 2, parents, 3);
+    
+    gen.weigths[0] = this.pairWeights(16, this.act, parents, 0);
+    for(var i = 0; i < this.cap; i++)
+    {
+        gen.activators[i] = this.pairActivators(this.act, parents, i);
+        if(i > 0)
+            gen.weigths[i] = this.pairWeights(this.act, this.act, parents, i);
+    }
+    gen.activators[i] = this.pairActivators(2, parents, i);
+    gen.weigths[i] = this.pairWeights(this.act, 2, parents, i);
 
     return gen;
-}
+};
 
 GeneticAlgorithm.prototype.pairTheBest = function (generation) {
 
     var newGeneration = [];
     var nGenes = generation.length;
-    var survivalRange = nGenes / 3;
-    var survivalParents = survivalRange / 9;                  //Save the best of the best
+    var survivalRange = nGenes * 0.05;
+    var survivalParents = survivalRange * 0.2;                  //Save the best of the best
     var bestGens = [];
 
     for (var i = 0; i < survivalRange; i++)
@@ -130,10 +132,11 @@ GeneticAlgorithm.prototype.pairTheBest = function (generation) {
     return newGeneration;
 };
 
-GeneticAlgorithm.prototype.mutate = function (generation, numMutations) {
+GeneticAlgorithm.prototype.mutate = function (generation) {
 
     var nGenes = generation.length;
-    var survivalParents = Math.floor(nGenes / 27); 
+    var survivalParents = Math.floor(nGenes * 0.01); 
+    var numMutations = ((this.act * this.act * this.cap) + (this.act * this.cap)) * 0.2;
     var fork;
     var cap;
     var iActivator;
@@ -174,7 +177,7 @@ GeneticAlgorithm.prototype.pair = function (generation) {
     
     newGeneration = this.sortGens(generation);
     newGeneration = this.pairTheBest(newGeneration);
-    newGeneration = this.mutate(newGeneration, 30);
+    newGeneration = this.mutate(newGeneration);
 
     return newGeneration;
 };
