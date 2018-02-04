@@ -12,7 +12,7 @@ function ArnoldAI(nIndividuals) {
 
     this.genSpan = $('#gen').find('span');
     this.generationSpan = $('#generation').find('span');
-    
+
     this.nIndividuals = nIndividuals;
     this.goodStore = 0;
 
@@ -92,9 +92,11 @@ ArnoldAI.prototype.checkStorageMove = function () {
     {
         //  Premia a los que muevan en todas las direcciones
         if (this.moveStore.up > 0 && this.moveStore.right > 0 && this.moveStore.down > 0 && this.moveStore.left > 0)
+        {
+            this.goodStore++;
             this.game.score = this.game.score * 10;
-        this.goodStore++;
-        console.log('Eureka: ' + this.goodStore + ' -> ' + this.game.score);
+            console.log('Eureka: ' + this.goodStore + ' -> ' + this.game.score);
+        }
     }
 
     this.moveStore = {
@@ -154,8 +156,8 @@ ArnoldAI.prototype.go = function () {
             this.play(this.generation[i++]);
 
         } while (!this.game.won && i < this.nIndividuals);
-        
-        if(!this.game.won)
+
+        if (!this.game.won)
             this.generation = this.genetic.pair(this.generation);
 
     } while (!this.game.won);
@@ -166,10 +168,10 @@ ArnoldAI.prototype.go = function () {
 };
 
 $(document).ready(function () {
-    var arnold = new ArnoldAI(1000);
+    var arnold = new ArnoldAI(500);
     console.log(arnold.generation[0]);
-    $('#arnold-btn').on('click', function () {        
-        arnold.go();        
+    $('#arnold-btn').on('click', function () {
+        arnold.go();
     });
 });
 

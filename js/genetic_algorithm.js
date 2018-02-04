@@ -1,7 +1,7 @@
 function GeneticAlgorithm() {
     //console.log('Algoritmo genetico');
-    this.cap = 2;
-    this.act = 12;
+    this.cap = 3;
+    this.act = 14;
 };
 
 GeneticAlgorithm.prototype.createActivators = function (n) {
@@ -28,8 +28,8 @@ GeneticAlgorithm.prototype.createWeights = function (init, final) {
     for (var i = 0; i < init; i++) {
         weigth[i] = [];
         for (var j = 0; j < final; j++) {
-            weigth[i][j] = Math.random() < 0.5 ? Math.random() : Math.random() * -1;
-            //weigth[i][j] = Math.random();
+            //weigth[i][j] = Math.random() < 0.5 ? Math.random() : Math.random() * -1;
+            weigth[i][j] = Math.random();
         }
     }
     return weigth;
@@ -155,8 +155,8 @@ GeneticAlgorithm.prototype.mutate = function (generation) {
                 iWeigth = Math.floor(Math.random() * generation[i].weigths[cap].length);
                 jWeigth = Math.floor(Math.random() * generation[i].weigths[cap][iWeigth].length);
                 
-                generation[i].weigths[cap][iWeigth][jWeigth] = Math.random() < 0.5 ? Math.random() : Math.random() * -1;
-                //generation[i].weigths[cap][iWeigth][jWeigth] = Math.random();
+                //generation[i].weigths[cap][iWeigth][jWeigth] = Math.random() < 0.5 ? Math.random() : Math.random() * -1;
+                generation[i].weigths[cap][iWeigth][jWeigth] = Math.random();
             }
             //activator
             else {
